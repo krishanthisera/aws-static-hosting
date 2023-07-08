@@ -1,0 +1,4 @@
+# config.remote.tfbackend
+workspaces { name = "blog" }
+hostname     = "app.terraform.io"
+organization = "bizkt"
