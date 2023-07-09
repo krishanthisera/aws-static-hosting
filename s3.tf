@@ -22,7 +22,7 @@ resource "aws_s3_bucket_website_configuration" "assets_bucket_website" {
 resource "aws_s3_bucket_acl" "assets_bucket_acl" {
   bucket = aws_s3_bucket.blog_assets.id
   acl    = "public-read"
-  depends_on = [ aws_s3_bucket_ownership_controls.s3_bucket_acl_ownership ]
+  depends_on = [ aws_s3_bucket_ownership_controls.assets_bucket_acl_ownership ]
 }
 
 # S3 bucket CORS configuration
