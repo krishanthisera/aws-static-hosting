@@ -1,7 +1,7 @@
 # Cloudfront distribution for main s3 site.
 resource "aws_cloudfront_distribution" "blog_distribution" {
   origin {
-    domain_name = "${var.domain_name}"
+    domain_name = aws_s3_bucket.blog_assets.bucket_regional_domain_name
     origin_id   = "S3-${var.bucket_name}"
 
     custom_origin_config {
@@ -16,7 +16,7 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
 
-  aliases = ["www.${var.domain_name}"]
+  aliases = ["www.${var.domain_name}", "${var.domain_name}"]
 
   custom_error_response {
     error_caching_min_ttl = 0
