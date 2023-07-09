@@ -62,12 +62,12 @@ data "aws_iam_policy_document" "allow_public_s3_read" {
     ]
 
     principals {
-        type        = "*"
-        identifiers = ["*"]
+        type        = "Service"
+        identifiers = ["cloudfront.amazonaws.com"]
     }
 
     resources = [
-      "arn:aws:s3:::www.${var.bucket_name}",
+      "arn:aws:s3:::${var.bucket_name}",
       "arn:aws:s3:::${var.bucket_name}/*"
     ]
   }
