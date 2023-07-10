@@ -1,7 +1,7 @@
 # S3 bucket for website.
 resource "aws_s3_bucket" "blog_assets" {
   bucket = var.bucket_name
-  
+
   tags = var.common_tags
 }
 

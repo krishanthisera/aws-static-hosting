@@ -15,11 +15,11 @@ variable "common_tags" {
 variable "ssl_certificate_arn" {
   type        = string
   description = "SSL certificate ARN for the CloudFront distribution."
-  default = ""
+  default     = ""
 }
 
 variable "aws_region" {
-  type = string
+  type        = string
   description = "AWS region to deploy to. This where the S3 bucket will be created."
-  default = "ap-southeast-2"
+  default     = "ap-southeast-2"
 }

@@ -1,9 +1,9 @@
 # Cloudfront distribution for main s3 site.
 resource "aws_cloudfront_distribution" "blog_distribution" {
-  origin {
-    domain_name = aws_s3_bucket.blog_assets.bucket_regional_domain_name
-    origin_id   = "S3-${var.bucket_name}"
 
+  origin {
+    domain_name              = aws_s3_bucket.blog_assets.bucket_regional_domain_name
+    origin_id                = "S3-${var.bucket_name}"
     origin_access_control_id = aws_cloudfront_origin_access_control.blog_distribution_origin_access.id
   }
 
@@ -70,7 +70,6 @@ resource "aws_cloudfront_origin_access_control" "blog_distribution_origin_access
 
 
 # Edge Functions
-
 resource "aws_cloudfront_function" "astro_default_edge_function" {
   name    = "default_edge_function"
   runtime = "cloudfront-js-1.0"
