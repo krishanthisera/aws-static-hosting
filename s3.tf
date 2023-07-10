@@ -1,6 +1,6 @@
 # S3 bucket for website.
 resource "aws_s3_bucket" "blog_assets" {
-  bucket = "${var.bucket_name}"
+  bucket = var.bucket_name
   policy = data.aws_iam_policy_document.allow_public_s3_read.json
 
   tags = var.common_tags
@@ -20,9 +20,9 @@ resource "aws_s3_bucket_website_configuration" "assets_bucket_website" {
 }
 
 resource "aws_s3_bucket_acl" "assets_bucket_acl" {
-  bucket = aws_s3_bucket.blog_assets.id
-  acl    = "public-read"
-  depends_on = [ aws_s3_bucket_ownership_controls.assets_bucket_acl_ownership ]
+  bucket     = aws_s3_bucket.blog_assets.id
+  acl        = "public-read"
+  depends_on = [aws_s3_bucket_ownership_controls.assets_bucket_acl_ownership]
 }
 
 # S3 bucket CORS configuration
@@ -47,28 +47,9 @@ resource "aws_s3_bucket_ownership_controls" "assets_bucket_acl_ownership" {
 
 
 resource "aws_s3_bucket_public_access_block" "assets_bucket_public_access" {
-  bucket = aws_s3_bucket.blog_assets.id
-
-}
-
-# IAM policy for public read of s3 bucket
-data "aws_iam_policy_document" "allow_public_s3_read" {
-  statement {
-    sid    = "PublicReadGetObject"
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObject",
-    ]
-
-    principals {
-        type        = "Service"
-        identifiers = ["cloudfront.amazonaws.com"]
-    }
-
-    resources = [
-      "arn:aws:s3:::${var.bucket_name}",
-      "arn:aws:s3:::${var.bucket_name}/*"
-    ]
-  }
+  bucket                  = aws_s3_bucket.blog_assets.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }

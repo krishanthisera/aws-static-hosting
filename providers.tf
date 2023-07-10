@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.0"
+      version = "~> 5.7"
     }
   }
 
@@ -12,10 +12,5 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-southeast-2"
-}
-
-provider "aws" {
-  alias  = "acm_provider"
-  region = "us-east-1"
+  region = "${var.aws_region}"
 }
