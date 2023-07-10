@@ -18,13 +18,13 @@ resource "aws_iam_group" "pipeline_deployment_group" {
 }
 
 # IAM Policy attachment for Pipeline Deployment - S3 PUT
-resource "aws_iam_group_policy_attachment" "se_put_group_policy_attachment" {
+resource "aws_iam_group_policy_attachment" "s3_put_group_policy_attachment" {
   group      = aws_iam_group.pipeline_deployment_group.name
   policy_arn = aws_iam_policy.allow_s3_put_policy.arn
 }
 
 # IAM Policy attachment for Pipeline Deployment - CloudFront Invalidation
-resource "aws_iam_group_policy_attachment" "cloudfront_invalidation_group_policy_attachment_2" {
+resource "aws_iam_group_policy_attachment" "cloudfront_invalidation_group_policy_attachment" {
   group      = aws_iam_group.pipeline_deployment_group.name
   policy_arn = aws_iam_policy.allow_cloudfront_invalidations_policy.arn
 }
