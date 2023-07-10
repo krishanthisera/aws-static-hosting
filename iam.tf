@@ -14,7 +14,7 @@ resource "aws_iam_policy" "allow_cloudfront_invalidations_policy" {
 
 # IAM User group for Pipeline Deployment
 resource "aws_iam_group" "pipeline_deployment_group" {
-  name = "pipeline_deployment_group"
+  name = "${var.domain_name}_deployment_group"
 }
 
 # IAM Policy attachment for Pipeline Deployment - S3 PUT
@@ -31,7 +31,7 @@ resource "aws_iam_group_policy_attachment" "cloudfront_invalidation_group_policy
 
 # IAM User for Pipeline Deployment
 resource "aws_iam_user" "pipeline_deployment_user" {
-  name = "${var.domain_name}-deployer"
+  name = "${var.domain_name}_deployer"
 }
 
 # IAM User group membership for Pipeline Deployment

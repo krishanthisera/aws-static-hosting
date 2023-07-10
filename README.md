@@ -44,6 +44,10 @@ To get started with this infrastructure, follow these steps:
 
 7. Once the Terraform apply process completes, your infrastructure will be deployed on AWS. You can access your static website or blog using the CloudFront URL provided.
 
+## Deployer User
+
+During the setup, an IAM user (`${var.domain_name}_deployer`) will be created with a set of relevant permissions. Once the deployment is completed, you may need to generate an access key pair for this user to integrate with your CI/CD Pipelines to generate access key pair.
+
 ## Further Reading
 
 Please refer to the following URL for further reading:
