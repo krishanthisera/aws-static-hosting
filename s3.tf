@@ -1,9 +1,14 @@
 # S3 bucket for website.
 resource "aws_s3_bucket" "blog_assets" {
   bucket = var.bucket_name
-  policy = data.aws_iam_policy_document.allow_public_s3_read.json
-
+  
   tags = var.common_tags
+}
+
+# S3 Bucket Policy Association
+resource "aws_s3_bucket_policy" "assets_bucket_policy" {
+  bucket = aws_s3_bucket.blog_assets.id
+  policy = data.aws_iam_policy_document.allow_public_s3_read.json
 }
 
 # S3 bucket website configuration 
