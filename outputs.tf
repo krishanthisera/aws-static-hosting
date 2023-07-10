@@ -8,5 +8,5 @@ output "cloudfront_arn" {
 }
 
 output "cloudfront_domain_name" {
-    value = aws_cloudfront_distribution.blog_distribution.domain_name
+  value = aws_cloudfront_distribution.blog_distribution.domain_name
 }

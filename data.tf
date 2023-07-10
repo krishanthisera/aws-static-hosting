@@ -36,3 +36,47 @@ data "aws_iam_policy_document" "allow_public_s3_read" {
     ]
   }
 }
+
+
+# IAM policy for cloudfront to invalidate cache
+data "aws_iam_policy_document" "allow_cloudfront_invalidate" {
+  statement {
+    sid    = "AllowCloudFrontInvalidation"
+    effect = "Allow"
+
+    actions = [
+      "cloudfront:CreateInvalidation",
+      "cloudfront:GetInvalidation",
+      "cloudfront:ListInvalidations"
+    ]
+
+    resources = [
+      "${aws_cloudfront_distribution.blog_distribution.arn}"
+    ]
+  }
+}
+
+# IAM Policy for put S3 objects
+data "aws_iam_policy_document" "allow_aws_s3_put" {
+  statement {
+    sid    = "AllowS3Put"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject*",
+      "s3:GetBucket*",
+      "s3:List*",
+      "s3:DeleteObject*",
+      "s3:PutObject",
+      "s3:PutObjectLegalHold",
+      "s3:PutObjectRetention",
+      "s3:PutObjectTagging",
+      "s3:PutObjectVersionTagging",
+      "s3:Abort*"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.bucket_name}/*"
+    ]
+  }
+}
