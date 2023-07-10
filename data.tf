@@ -6,7 +6,7 @@ locals {
 }
 
 # IAM policy for public read of s3 bucket
-data "aws_s3_bucket_policy" "allow_public_s3_read" {
+data "aws_iam_policy_document" "allow_public_s3_read" {
   statement {
     sid    = "PublicReadGetObject"
     effect = "Allow"
