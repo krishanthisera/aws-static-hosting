@@ -22,10 +22,10 @@ data "aws_iam_policy_document" "allow_public_s3_read" {
 
     condition {
       test     = "StringEquals"
-      variable = "AWS:SourceArn"
+      variable = "aws:SourceArn"
 
       values = [
-        "arn:aws:cloudfront::${local.account_id}:distribution/*"
+        "${aws_cloudfront_distribution.blog_distribution.arn}"
       ]
     }
 
