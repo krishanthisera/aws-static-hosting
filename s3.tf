@@ -5,16 +5,10 @@ resource "aws_s3_bucket" "blog_assets" {
   tags = var.common_tags
 }
 
-# S3 Bucket Policy Association - CloudFront Access
+# S3 Bucket Policy Association
 resource "aws_s3_bucket_policy" "assets_bucket_cloudfront_policy_association" {
   bucket = aws_s3_bucket.blog_assets.id
-  policy = data.aws_iam_policy_document.cf_s3_read_policy.json
-}
-
-# S3 Bucket Policy Association - Deployer User Access
-resource "aws_s3_bucket_policy" "assets_bucket_deployer_policy_association" {
-  bucket = aws_s3_bucket.blog_assets.id
-  policy = data.aws_iam_policy_document.deployer_s3_read_policy.json
+  policy = data.aws_iam_policy_document.s3_bucket_policy.json
 }
 
 # S3 bucket website configuration 

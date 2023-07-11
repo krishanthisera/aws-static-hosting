@@ -5,8 +5,27 @@ locals {
   account_id = data.aws_caller_identity.current.account_id
 }
 
-# IAM policy for CloudFront Read Access
-data "aws_iam_policy_document" "cf_s3_read_policy" {
+# S3 Bucket Policy to Associate with the S3 Bucket
+data "aws_iam_policy_document" "s3_bucket_policy" {
+  # Deployer User access to S3 bucket
+  statement {
+    sid    = "DeployerUser"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_user.pipeline_deployment_user.arn]
+    }
+
+    resources = [
+      "arn:aws:s3:::${var.bucket_name}"
+    ]
+  }
+  # CloudFront access to S3 bucket
   statement {
     sid    = "CloudFront"
     effect = "Allow"
@@ -19,38 +38,6 @@ data "aws_iam_policy_document" "cf_s3_read_policy" {
     principals {
       type        = "Service"
       identifiers = ["cloudfront.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceArn"
-
-      values = [
-        "${aws_cloudfront_distribution.blog_distribution.arn}"
-      ]
-    }
-
-    resources = [
-      "arn:aws:s3:::${var.bucket_name}",
-      "arn:aws:s3:::${var.bucket_name}/*"
-    ]
-  }
-}
-
-
-# IAM policy Deployer User
-data "aws_iam_policy_document" "deployer_s3_read_policy" {
-  statement {
-    sid    = "DeployerUser"
-    effect = "Allow"
-
-    actions = [
-      "s3:ListBucket"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_user.pipeline_deployment_user.arn]
     }
 
     condition {
