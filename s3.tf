@@ -24,9 +24,10 @@ resource "aws_s3_bucket_website_configuration" "assets_bucket_website" {
   }
 }
 
+# S3 bucket ACL
 resource "aws_s3_bucket_acl" "assets_bucket_acl" {
   bucket     = aws_s3_bucket.blog_assets.id
-  acl        = "public-read"
+  acl        = "private"
   depends_on = [aws_s3_bucket_ownership_controls.assets_bucket_acl_ownership]
 }
 
