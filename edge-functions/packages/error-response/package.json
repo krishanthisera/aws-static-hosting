@@ -1,9 +1,0 @@
-{
-  "name": "@edge-functions/error-response",
-  "version": "1.0.0",
-  "description": "Error response Edge Functions",
-  "main": "build/index.js",
-  "scripts": {
-    "build": "tsc --build"
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "name": "@edge-functions/cache-control",
-  "version": "1.0.0",
-  "description": "Edge Function to set Cache-Control headers",
-  "main": "build/index.js",
-  "scripts": {
-    "build": "tsc --build"
-  }
-}
