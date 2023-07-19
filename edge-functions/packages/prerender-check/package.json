@@ -1,9 +1,0 @@
-{
-  "name": "@edge-functions/prerender-check",
-  "version": "1.0.0",
-  "description": "Prerender check Edge Function",
-  "main": "build/index.js",
-  "scripts": {
-    "build": "tsc --build"
-  }
-}

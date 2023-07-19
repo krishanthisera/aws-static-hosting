@@ -1,5 +1,0 @@
-node_modules/*
-cdk.out/*
-packages/*/build/*
-
-jest.config.js

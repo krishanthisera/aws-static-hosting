@@ -8,13 +8,7 @@ terraform {
     }
   }
 
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "bizkt"
-    workspaces {
-      name = "blog-infra"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "aws" {
