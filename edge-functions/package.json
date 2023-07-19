@@ -1,0 +1,31 @@
+{
+  "name": "edge-functions",
+  "version": "1.0.0",
+  "description": "Edge Functions",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "aws-lambda": "^1.0.7",
+    "axios": "^1.4.0",
+    "eslint": "^8.45.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.6"
+  },
+  "scripts": {
+    "build": "tsc --build --verbose",
+    "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
+    "lint:check": "npm run lint",
+    "lint:fix": "npm run lint --fix",
+    "format": "prettier --ignore-path .gitignore --check \"**/*.+(js|ts|json)\"",
+    "format:check": "prettier --ignore-path ../.gitignore --check \"**/*.+(js|ts|json)\"",
+    "format:fix": "prettier --ignore-path ../.gitignore --write \"**/*.+(js|ts|json)\""
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "ts-node": "^10.9.1"
+  }
+}
