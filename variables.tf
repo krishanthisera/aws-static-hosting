@@ -10,6 +10,9 @@ variable "bucket_name" {
 
 variable "common_tags" {
   description = "Common tags you want applied to all components."
+  default = {
+    "ManagedBy" = "Terraform"
+  }
 }
 
 variable "ssl_certificate_arn" {
