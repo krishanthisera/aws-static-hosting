@@ -25,9 +25,14 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "S3-${var.bucket_name}"
 
-    function_association {
+    lambda_function_association {
+      event_type   = "origin-request"
+      lambda_arn   = module.edge-functions.function_arns["prerender"]
+    }
+
+    lambda_function_association {
       event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.astro_default_edge_function.arn
+      lambda_arn   = module.edge-functions.function_arns["prerender-check"]
     }
 
     forwarded_values {
