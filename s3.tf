@@ -16,11 +16,11 @@ resource "aws_s3_bucket_website_configuration" "assets_bucket_website" {
   bucket = aws_s3_bucket.blog_assets.id
 
   index_document {
-    suffix = "index.html"
+    suffix = var.index_document
   }
 
   error_document {
-    key = "404.html"
+    key = var.error_document
   }
 }
 

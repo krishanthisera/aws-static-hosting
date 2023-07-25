@@ -9,7 +9,7 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  default_root_object = "index.html"
+  default_root_object = var.index_document
 
   aliases = ["www.${var.domain_name}", "${var.domain_name}"]
 
@@ -17,7 +17,7 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     error_caching_min_ttl = 0
     error_code            = 404
     response_code         = 200
-    response_page_path    = "/404.html"
+    response_page_path    = "/${var.error_document}"
   }
 
   default_cache_behavior {
@@ -26,13 +26,13 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     target_origin_id = "S3-${var.bucket_name}"
 
     lambda_function_association {
-      event_type   = "origin-request"
-      lambda_arn   = module.edge-functions.function_arns["prerender"]
+      event_type = "origin-request"
+      lambda_arn = module.edge-functions.function_arns["prerender"]
     }
 
     lambda_function_association {
-      event_type   = "viewer-request"
-      lambda_arn   = module.edge-functions.function_arns["prerender-check"]
+      event_type = "viewer-request"
+      lambda_arn = module.edge-functions.function_arns["prerender-check"]
     }
 
     forwarded_values {
@@ -71,14 +71,4 @@ resource "aws_cloudfront_origin_access_control" "blog_distribution_origin_access
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
-}
-
-
-# Edge Functions
-resource "aws_cloudfront_function" "astro_default_edge_function" {
-  name    = "default_edge_function"
-  runtime = "cloudfront-js-1.0"
-  comment = "CloudFront Functions for Astro"
-  publish = true
-  code    = file("src/astro.js")
 }
