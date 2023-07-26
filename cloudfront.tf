@@ -36,7 +36,7 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     }
 
     forwarded_values {
-      headers      = ["x-request-prerender"]
+      headers      = ["X-Request-Prerender", "X-Prerender-Host"]
       query_string = false
 
       cookies {
