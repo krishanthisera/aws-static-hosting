@@ -13,13 +13,6 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
 
   aliases = ["www.${var.domain_name}", "${var.domain_name}"]
 
-  custom_error_response {
-    error_caching_min_ttl = 0
-    error_code            = 404
-    response_code         = 200
-    response_page_path    = "/404.html"
-  }
-
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
@@ -33,6 +26,11 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     lambda_function_association {
       event_type   = "viewer-request"
       lambda_arn   = module.edge-functions.function_arns["prerender-check"]
+    }
+
+    lambda_function_association {
+      event_type   = "origin-response"
+      lambda_arn   = module.edge-functions.function_arns["cache-control"]
     }
 
     forwarded_values {
