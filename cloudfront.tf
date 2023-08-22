@@ -22,7 +22,7 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
       for_each = var.lambda_associations
       content {
         event_type = lambda_function_association.value.event_type
-        lambda_arn = lambda_function_association.value.lambda_arn
+        lambda_arn =  module.edge-functions.function_arns["${lambda_function_association.value.lambda_name}"]
       }
     }
 

@@ -28,20 +28,20 @@ variable "lambda_associations" {
   description = "Lambda function associations"
   type = list(object({
     event_type = string
-    lambda_arn = string
+    lambda_name = string
   }))
   default = [
     {
       event_type = "viewer-request"
-      lambda_arn = "module.edge-functions.function_arns[\"filter-function\"]"
+      lambda_name = "filter-function"
     },
     {
       event_type = "origin-request"
-      lambda_arn = "module.edge-functions.function_arns[\"prerender-proxy\"]"
+      lambda_name = "prerender-proxy"
     },
     {
       event_type = "origin-response"
-      lambda_arn = "module.edge-functions.function_arns[\"response-handler\"]"
+      lambda_name = "response-handler"
     }
   ]
 }
