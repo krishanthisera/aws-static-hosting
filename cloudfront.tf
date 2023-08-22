@@ -18,19 +18,12 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "S3-${var.bucket_name}"
 
-    lambda_function_association {
-      event_type   = "origin-request"
-      lambda_arn   = module.edge-functions.function_arns["prerender"]
-    }
-
-    lambda_function_association {
-      event_type   = "viewer-request"
-      lambda_arn   = module.edge-functions.function_arns["prerender-check"]
-    }
-
-    lambda_function_association {
-      event_type   = "origin-response"
-      lambda_arn   = module.edge-functions.function_arns["cache-control"]
+    dynamic "lambda_function_association" {
+      for_each = var.lambda_associations
+      content {
+        event_type = lambda_function_association.value.event_type
+        lambda_arn = lambda_function_association.value.lambda_arn
+      }
     }
 
     forwarded_values {
@@ -70,14 +63,4 @@ resource "aws_cloudfront_origin_access_control" "blog_distribution_origin_access
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
-}
-
-
-# Edge Functions
-resource "aws_cloudfront_function" "astro_default_edge_function" {
-  name    = "default_edge_function"
-  runtime = "cloudfront-js-1.0"
-  comment = "CloudFront Functions for Astro"
-  publish = true
-  code    = file("src/astro.js")
 }
