@@ -27,20 +27,20 @@ variable "aws_region" {
 variable "lambda_associations" {
   description = "Lambda function associations"
   type = list(object({
-    event_type = string
+    event_type  = string
     lambda_name = string
   }))
   default = [
     {
-      event_type = "viewer-request"
+      event_type  = "viewer-request"
       lambda_name = "filter-function"
     },
     {
-      event_type = "origin-request"
+      event_type  = "origin-request"
       lambda_name = "prerender-proxy"
     },
     {
-      event_type = "origin-response"
+      event_type  = "origin-response"
       lambda_name = "response-handler"
     }
   ]
