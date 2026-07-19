@@ -99,3 +99,10 @@ data "aws_iam_policy_document" "allow_aws_s3_put" {
     ]
   }
 }
+
+data "aws_route53_zone" "domain" {
+  count = var.create_validation_records ? 1 : 0
+
+  name         = var.domain_name
+  private_zone = false
+}

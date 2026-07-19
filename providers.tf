@@ -3,20 +3,9 @@ terraform {
 
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.55"
+      source                = "hashicorp/aws"
+      version               = "~> 6.55"
+      configuration_aliases = [aws.us_east_1]
     }
   }
-
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "bizkt"
-    workspaces {
-      name = "blog-infra"
-    }
-  }
-}
-
-provider "aws" {
-  region = var.aws_region
 }

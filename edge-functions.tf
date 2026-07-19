@@ -1,3 +1,7 @@
 module "edge-functions" {
-  source = "github.com/krishanthisera/aws-edge-functions.git"
+  source = "github.com/krishantha/aws-edge-functions"
+
+  providers = {
+    aws = aws.us_east_1
+  }
 }

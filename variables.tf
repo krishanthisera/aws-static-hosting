@@ -3,6 +3,12 @@ variable "domain_name" {
   description = "The domain name for the website."
 }
 
+variable "additional_domain_aliases" {
+  type        = list(string)
+  description = "Additional domain aliases for the website."
+  default     = []
+}
+
 variable "bucket_name" {
   type        = string
   description = "The name of the bucket without the www. prefix. Normally domain_name."
@@ -44,4 +50,10 @@ variable "lambda_associations" {
       lambda_name = "response-handler"
     }
   ]
+}
+
+variable "create_validation_records" {
+  description = "Whether to create Route 53 validation records for the SSL certificate."
+  type        = bool
+  default     = false
 }
