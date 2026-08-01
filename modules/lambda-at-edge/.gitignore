@@ -83,6 +83,9 @@ Thumbs.db
 
 *.tsbuildinfo
 
+# Ignore lock files
+.terraform.lock.hcl
+
 # function_archives
 function_archives/
 
