@@ -1,0 +1,16 @@
+{
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["build/**"]
+    },
+    "test": {},
+    "typecheck": {},
+    "lint": {},
+    "lint:fix": {},
+    "dev": {
+      "cache": false
+    }
+  },
+  "globalDependencies": ["tsconfig.json"]
+}

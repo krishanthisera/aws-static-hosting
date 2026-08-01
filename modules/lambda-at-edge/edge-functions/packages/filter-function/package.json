@@ -1,0 +1,14 @@
+{
+  "name": "@edge-functions/prerender-check",
+  "version": "1.0.0",
+  "description": "Prerender check Edge Function",
+  "type": "module",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rm -rf build && node esbuild.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "esbuild-runner": "^2.2.1"
+  }
+}

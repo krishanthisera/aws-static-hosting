@@ -1,0 +1,15 @@
+{
+  "name": "@edge-functions/geo-redirect",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Edge Function to set Cache-Control headers",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rm -rf build && node esbuild.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "commander": "^8.3.0",
+    "esbuild-runner": "^2.2.1"
+  }
+}
