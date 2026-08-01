@@ -143,21 +143,21 @@ After `terraform apply`, generate an access key pair for this user and add the c
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.15 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.55 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 6.55.0 |
 | <a name="provider_aws.us_east_1"></a> [aws.us\_east\_1](#provider\_aws.us\_east\_1) | 6.55.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_acm_certificate.ssl_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
 | [aws_acm_certificate_validation.cert_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
 | [aws_cloudfront_distribution.blog_distribution](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
@@ -181,7 +181,7 @@ After `terraform apply`, generate an access key pair for this user and add the c
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_additional_domain_aliases"></a> [additional\_domain\_aliases](#input\_additional\_domain\_aliases) | Additional domain aliases for the website. | `list(string)` | `[]` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region to deploy to. This where the S3 bucket will be created. | `string` | `"ap-southeast-2"` | no |
 | <a name="input_bucket_name"></a> [bucket\_name](#input\_bucket\_name) | The name of the bucket without the www. prefix. Normally domain\_name. | `string` | n/a | yes |
@@ -194,8 +194,10 @@ After `terraform apply`, generate an access key pair for this user and add the c
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_assets_bucket_domain_name"></a> [assets\_bucket\_domain\_name](#output\_assets\_bucket\_domain\_name) | n/a |
 | <a name="output_cloudfront_arn"></a> [cloudfront\_arn](#output\_cloudfront\_arn) | n/a |
+| <a name="output_cloudfront_distribution_id"></a> [cloudfront\_distribution\_id](#output\_cloudfront\_distribution\_id) | n/a |
 | <a name="output_cloudfront_domain_name"></a> [cloudfront\_domain\_name](#output\_cloudfront\_domain\_name) | n/a |
+| <a name="output_iam_user_pipeline_deployment_user_arn"></a> [iam\_user\_pipeline\_deployment\_user\_arn](#output\_iam\_user\_pipeline\_deployment\_user\_arn) | n/a |
 <!-- END_TF_DOCS -->

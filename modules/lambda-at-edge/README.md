@@ -152,9 +152,9 @@ Pull requests and issues are welcome at the [aws-static-hosting repository](http
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_archive"></a> [archive](#provider\_archive) | 2.8.0 |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.55.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.3.0 |
+| <a name="provider_archive"></a> [archive](#provider\_archive) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.55 |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Resources
 
