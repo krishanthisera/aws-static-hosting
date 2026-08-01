@@ -1,13 +1,13 @@
 # IAM Policy for put S3 objects
 resource "aws_iam_policy" "allow_s3_put_policy" {
-  name        = "allow_aws_s3_put"
+  name        = "${var.domain_name}_allow_aws_s3_put"
   description = "Allow Pipeline Deployment to put objects in S3"
   policy      = data.aws_iam_policy_document.allow_aws_s3_put.json
 }
 
 # IAM policy for cloudfront to invalidate cache
 resource "aws_iam_policy" "allow_cloudfront_invalidations_policy" {
-  name        = "allow_cloudfront_invalidate"
+  name        = "${var.domain_name}_allow_cloudfront_invalidate"
   description = "Allow pipeline user to create CloudFront invalidation"
   policy      = data.aws_iam_policy_document.allow_cloudfront_invalidate.json
 }
@@ -36,7 +36,7 @@ resource "aws_iam_user" "pipeline_deployment_user" {
 
 # IAM User group membership for Pipeline Deployment
 resource "aws_iam_group_membership" "deployment_group_membership" {
-  name = "pipeline_deployment_group_membership"
+  name = "${var.domain_name}_pipeline_deployment_group_membership"
   users = [
     aws_iam_user.pipeline_deployment_user.name
   ]

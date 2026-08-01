@@ -59,7 +59,7 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
 
 # Cloudfront distribution for assets s3 site.
 resource "aws_cloudfront_origin_access_control" "blog_distribution_origin_access" {
-  name                              = "blog_distribution_origin_access"
+  name                              = "${var.domain_name}_distribution_origin_access"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
