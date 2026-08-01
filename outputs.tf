@@ -18,3 +18,7 @@ output "cloudfront_distribution_id" {
 output "iam_user_pipeline_deployment_user_arn" {
   value = aws_iam_user.pipeline_deployment_user.arn
 }
+
+output "iam_user_pipeline_deployment_user_name" {
+  value = aws_iam_user.pipeline_deployment_user.name
+}

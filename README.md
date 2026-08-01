@@ -200,4 +200,5 @@ After `terraform apply`, generate an access key pair for this user and add the c
 | <a name="output_cloudfront_distribution_id"></a> [cloudfront\_distribution\_id](#output\_cloudfront\_distribution\_id) | n/a |
 | <a name="output_cloudfront_domain_name"></a> [cloudfront\_domain\_name](#output\_cloudfront\_domain\_name) | n/a |
 | <a name="output_iam_user_pipeline_deployment_user_arn"></a> [iam\_user\_pipeline\_deployment\_user\_arn](#output\_iam\_user\_pipeline\_deployment\_user\_arn) | n/a |
+| <a name="output_iam_user_pipeline_deployment_user_name"></a> [iam\_user\_pipeline\_deployment\_user\_name](#output\_iam\_user\_pipeline\_deployment\_user\_name) | n/a |
 <!-- END_TF_DOCS -->
