@@ -1,16 +1,28 @@
 repos:
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.108.0
-    hooks:
-      - id: terraform_fmt
-      - id: terraform_docs
-      - id: terraform_providers_lock
-        args:
-          - --args=-platform=linux_amd64
-          - --args=-platform=darwin_amd64
-          - --args=-platform=darwin_arm64
-        exclude: ^modules/.*$
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-      - id: check-merge-conflict
+- repo: https://github.com/antonbabenko/pre-commit-terraform
+  rev: v1.108.0
+  hooks:
+  - id: terraform_fmt
+  - id: terraform_docs
+    name: terraform_docs (root)
+    args:
+    - --hook-config=--path-to-file=README.md
+    - --hook-config=--add-to-existing-file=true
+    - --hook-config=--create-file-if-not-exist=true
+  - id: terraform_docs
+    name: terraform_docs (lambda-at-edge module)
+    args:
+    - --hook-config=--path-to-file=README.md
+    - --hook-config=--add-to-existing-file=true
+    - --hook-config=--create-file-if-not-exist=true
+    files: ^modules/lambda-at-edge/
+  - id: terraform_providers_lock
+    args:
+    - --args=-platform=linux_amd64
+    - --args=-platform=darwin_amd64
+    - --args=-platform=darwin_arm64
+    exclude: ^modules/.*$
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: check-merge-conflict
