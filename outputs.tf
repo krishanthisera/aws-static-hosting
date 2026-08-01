@@ -14,3 +14,7 @@ output "cloudfront_domain_name" {
 output "cloudfront_distribution_id" {
   value = aws_cloudfront_distribution.blog_distribution.id
 }
+
+output "iam_user_pipeline_deployment_user_arn" {
+  value = aws_iam_user.pipeline_deployment_user.arn
+}
