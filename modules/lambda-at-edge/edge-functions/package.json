@@ -13,7 +13,7 @@
     "@yarnpkg/esbuild-plugin-pnp": "^3.0.0-rc.15",
     "aws-lambda": "^1.0.7",
     "axios": "^1.7.4",
-    "dotenv": "^16.3.1",
+    "dotenv": "^17.4.2",
     "dotenv-cli": "latest",
     "eslint": "^8.45.0",
     "prettier": "^3.0.0",
