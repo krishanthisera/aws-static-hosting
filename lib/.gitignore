@@ -1,0 +1,30 @@
+# Node / Yarn
+node_modules/
+
+# Turborepo
+.turbo/
+
+# Build output
+# Function bundles are built in CI and published to the GitHub Packages
+# registry (@krishanthisera/*). They are not committed to the repo.
+**/build/
+dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# Tests
+coverage/
+
+# Lambda@Edge local packaging artifacts
+function_archives/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kept intentionally (do NOT ignore):
+#   .npmrc  -> scope -> GitHub Packages registry mapping

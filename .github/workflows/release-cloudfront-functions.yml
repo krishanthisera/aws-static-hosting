@@ -1,0 +1,50 @@
+name: Release CloudFront Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lib/cloudfront-functions/**"
+      - ".github/workflows/release-cloudfront-functions.yml"
+
+concurrency:
+  group: release-cloudfront-functions
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: semantic-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: https://npm.pkg.github.com
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        working-directory: lib/cloudfront-functions
+
+      - name: Build
+        run: yarn build
+        working-directory: lib/cloudfront-functions
+
+      - name: Release
+        run: npx --no-install semantic-release
+        working-directory: lib/cloudfront-functions/packages/uri-rewrite
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
