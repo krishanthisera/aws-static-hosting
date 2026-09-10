@@ -1,0 +1,26 @@
+{
+  "name": "@krishanthisera/response-handler",
+  "version": "0.0.0-development",
+  "description": "Lambda@Edge origin-response function: sets cache-control and injects custom error pages",
+  "type": "module",
+  "main": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krishanthisera/aws-static-hosting.git",
+    "directory": "lib/lambda-at-edge/packages/response-handler"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rm -rf build && node esbuild.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "axios": "^1.7.4"
+  }
+}

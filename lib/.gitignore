@@ -13,8 +13,12 @@ dist/
 # TypeScript
 *.tsbuildinfo
 
-# Tests
+# Lint / test caches and reports
+.eslintcache
 coverage/
+
+# Package tarballs (npm pack / semantic-release dry runs)
+*.tgz
 
 # Lambda@Edge local packaging artifacts
 function_archives/

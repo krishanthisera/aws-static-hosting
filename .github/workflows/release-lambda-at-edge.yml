@@ -1,0 +1,61 @@
+name: Release Lambda@Edge Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lib/lambda-at-edge/**"
+      - ".github/workflows/release-lambda-at-edge.yml"
+
+concurrency:
+  group: release-lambda-at-edge
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: semantic-release (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        package:
+          - filter-function
+          - prerender-proxy
+          - geo-redirect
+          - response-handler
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: lib/lambda-at-edge/.nvmrc
+          registry-url: https://npm.pkg.github.com
+          scope: "@krishanthisera"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        working-directory: lib/lambda-at-edge
+
+      - name: Build
+        run: yarn build
+        working-directory: lib/lambda-at-edge
+
+      - name: Release
+        run: npx --no-install semantic-release
+        working-directory: lib/lambda-at-edge/packages/${{ matrix.package }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

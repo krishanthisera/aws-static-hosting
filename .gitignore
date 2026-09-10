@@ -32,3 +32,20 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# ---- Node / JS ----
+# The edge-function workspaces under lib/ are authoritative in lib/.gitignore;
+# these are repo-wide safety nets.
+**/node_modules/
+**/.turbo/
+**/build/
+**/dist/
+**/coverage/
+**/*.tsbuildinfo
+**/*.tgz
+**/.eslintcache
+
+# ---- OS / editor ----
+**/.DS_Store
+Thumbs.db
+*.swp

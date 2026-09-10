@@ -1,0 +1,23 @@
+{
+  "name": "@krishanthisera/filter-function",
+  "version": "0.0.0-development",
+  "description": "Lambda@Edge viewer-request function: flags bot/crawler traffic for prerendering",
+  "type": "module",
+  "main": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krishanthisera/aws-static-hosting.git",
+    "directory": "lib/lambda-at-edge/packages/filter-function"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rm -rf build && node esbuild.js",
+    "test": "vitest run"
+  }
+}

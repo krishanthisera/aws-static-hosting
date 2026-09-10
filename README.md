@@ -22,7 +22,7 @@ Browser → CloudFront (CDN + Lambda@Edge) → S3 (private bucket)
 | **CloudFront Distribution** | CDN with IPv6, forced HTTPS, 1-year cache TTL, and Lambda@Edge associations |
 | **ACM Certificate** | SSL/TLS certificate provisioned in `us-east-1` (required by CloudFront) |
 | **Route 53 Records** | Optional DNS validation records for the ACM certificate (see [SSL Certificate Validation](#ssl-certificate-validation)) |
-| **Lambda@Edge Module** | Local Terraform module (`modules/lambda-at-edge/`) deploying edge functions for viewer filtering, prerender proxy, geo-redirect, and response handling |
+| **Lambda@Edge Module** | Local Terraform module (`modules/edge-functions/`) deploying edge functions for viewer filtering, prerender proxy, geo-redirect, and response handling. Function code is published to GitHub Packages (`@krishanthisera/*`) from `lib/lambda-at-edge/` and `lib/cloudfront-functions/` |
 | **IAM User & Group** | Deployer user (`<domain>_deployer`) with scoped S3 PUT and CloudFront invalidation permissions for CI/CD |
 
 ## Prerequisites
@@ -63,7 +63,7 @@ By default, three Lambda@Edge functions are associated with the CloudFront distr
 | `origin-request` | `prerender-proxy` | Proxies bot/crawler traffic to a prerender service for server-side rendering |
 | `origin-response` | `response-handler` | Applies cache-control headers to origin responses |
 
-These functions are managed by a local Terraform module located in `modules/lambda-at-edge/`. The TypeScript source code for each function is in `modules/lambda-at-edge/edge-functions/packages/`.
+These functions are managed by a local Terraform module located in `modules/edge-functions/`. The TypeScript source lives in `lib/lambda-at-edge/packages/` (Lambda@Edge) and `lib/cloudfront-functions/packages/` (CloudFront Functions); each package is built and published to the GitHub Packages npm registry as `@krishanthisera/<name>` by CI, and Terraform consumes a pinned version. Per-deployment config reaches the Lambda@Edge functions through CloudFront origin custom headers (`x-edge-cfg-*`) — see `lib/lambda-at-edge/README.md`.
 
 ### Additional Functions
 
