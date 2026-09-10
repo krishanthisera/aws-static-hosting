@@ -90,6 +90,25 @@ identical to `lib/cloudfront-functions/` — see that package's
 - **Output:** `@krishanthisera/<fn>@X.Y.Z` in GitHub Packages (tarball contains
   only `build/`), tag `@krishanthisera/<fn>-vX.Y.Z`, and a GitHub Release.
 
+### S3 mirror publish — disabled
+
+These functions are not deployed by this repo, so the release **only** publishes
+to GitHub Packages. The optional step that also mirrored the built bundle to
+`s3://$EDGE_ARTIFACTS_BUCKET/lambda-at-edge/<fn>/<version>.zip` (for the Terraform
+`edge-functions` module to deploy from) is turned off in two coupled places:
+
+1. the `Configure AWS credentials` step in
+   [`release-lambda-at-edge.yml`](../../.github/workflows/release-lambda-at-edge.yml)
+   is commented out, and
+2. the `@semantic-release/exec` plugin block has been removed from every
+   `packages/*/.releaserc.json`.
+
+Re-enable **both** together to restore it — leaving the `exec` block in without
+the AWS credentials makes `aws s3 cp` fail, which fails the entire
+semantic-release run (so the npm publish is lost too). The workflow comment lists
+the required repo secrets/variables. The `@semantic-release/exec` dev dependency
+is kept in [`package.json`](package.json) so re-enabling is just config.
+
 ## Consuming from Terraform (pending migration)
 
 The edge-functions Terraform module pins a version per function, pulls the built

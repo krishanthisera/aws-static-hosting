@@ -7,6 +7,30 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     origin_access_control_id = aws_cloudfront_origin_access_control.blog_distribution_origin_access.id
   }
 
+  dynamic "custom_error_response" {
+    for_each = var.custom_error_responses
+    content {
+      error_code            = custom_error_response.value.error_code
+      response_code         = custom_error_response.value.response_code
+      response_page_path    = custom_error_response.value.response_page_path
+      error_caching_min_ttl = custom_error_response.value.error_caching_min_ttl
+    }
+  }
+
+  custom_error_response {
+    error_code            = 403
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 10
+  }
+
+  custom_error_response {
+    error_code            = 404
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 10
+  }
+
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
@@ -18,11 +42,19 @@ resource "aws_cloudfront_distribution" "blog_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "S3-${var.bucket_name}"
 
+    dynamic "function_association" {
+      for_each = var.cloudfront_function_associations
+      content {
+        event_type   = function_association.value.event_type
+        function_arn = module.edge_functions[0].cloudfront_function_arns[function_association.value.lambda_name]
+      }
+    }
+
     dynamic "lambda_function_association" {
       for_each = var.lambda_associations
       content {
         event_type = lambda_function_association.value.event_type
-        lambda_arn = module.edge_functions[0].function_arns[lambda_function_association.value.lambda_name]
+        lambda_arn = module.edge_functions[0].lambda_qualified_arns[lambda_function_association.value.lambda_name]
       }
     }
 

@@ -42,3 +42,22 @@ resource "aws_iam_group_membership" "deployment_group_membership" {
   ]
   group = aws_iam_group.pipeline_deployment_group.name
 }
+
+# IAM User for CI to publish built Lambda@Edge bundles to the edge artifacts bucket
+resource "aws_iam_user" "edge_publisher_user" {
+  count = local.lambda_edge_enabled ? 1 : 0
+  name  = "${var.domain_name}_edge_publisher"
+}
+
+resource "aws_iam_policy" "allow_edge_artifacts_put_policy" {
+  count       = local.lambda_edge_enabled ? 1 : 0
+  name        = "${var.domain_name}_allow_edge_artifacts_put"
+  description = "Allow CI to upload built Lambda@Edge bundles to the edge artifacts bucket"
+  policy      = data.aws_iam_policy_document.allow_edge_artifacts_put[0].json
+}
+
+resource "aws_iam_user_policy_attachment" "edge_publisher_put_attachment" {
+  count      = local.lambda_edge_enabled ? 1 : 0
+  user       = aws_iam_user.edge_publisher_user[0].name
+  policy_arn = aws_iam_policy.allow_edge_artifacts_put_policy[0].arn
+}

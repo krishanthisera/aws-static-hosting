@@ -22,3 +22,11 @@ output "iam_user_pipeline_deployment_user_arn" {
 output "iam_user_pipeline_deployment_user_name" {
   value = aws_iam_user.pipeline_deployment_user.name
 }
+
+output "edge_artifacts_bucket" {
+  value = one(aws_s3_bucket.edge_artifacts[*].bucket)
+}
+
+output "edge_publisher_user_name" {
+  value = one(aws_iam_user.edge_publisher_user[*].name)
+}

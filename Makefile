@@ -4,6 +4,10 @@
 LAMBDA_DIR := lib/lambda-at-edge
 CF_DIR     := lib/cloudfront-functions
 
+LAMBDA_FUNCTIONS      := filter-function prerender-proxy geo-redirect response-handler
+SEED_VERSION          ?= 1.0.0
+EDGE_ARTIFACTS_BUCKET  ?= $(shell terraform output -raw edge_artifacts_bucket 2>/dev/null)
+
 ##@ General
 
 .PHONY: help
@@ -96,6 +100,11 @@ build-response-handler: ## Build response-handler (Lambda@Edge)
 build-uri-rewrite: ## Build uri-rewrite (CloudFront Function)
 	cd $(CF_DIR) && yarn workspace @krishanthisera/uri-rewrite build
 
+.PHONY: build-uri-rewrite-committed
+build-uri-rewrite-committed: ## Rebuild + stage the committed uri-rewrite bundle (used by pre-commit)
+	cd $(CF_DIR) && yarn install --frozen-lockfile --silent && yarn workspace @krishanthisera/uri-rewrite build
+	git add $(CF_DIR)/packages/uri-rewrite/build/index.js
+
 ##@ Lint
 
 .PHONY: lint
@@ -109,12 +118,16 @@ lint-fix: ## Run linters and fix issues (Lambda@Edge)
 ##@ Format
 
 .PHONY: format
-format: ## Check code formatting (Lambda@Edge)
+format: ## Check code formatting (Lambda@Edge + Terraform/HCL)
 	cd $(LAMBDA_DIR) && yarn format:check
+	@echo "Checking Terraform/HCL formatting..."
+	terraform fmt -check -recursive
 
 .PHONY: format-fix
-format-fix: ## Fix code formatting (Lambda@Edge)
+format-fix: ## Fix code formatting (Lambda@Edge + Terraform/HCL)
 	cd $(LAMBDA_DIR) && yarn format:fix
+	@echo "Formatting Terraform/HCL..."
+	terraform fmt -recursive
 
 ##@ Release
 
@@ -152,6 +165,19 @@ tf-docs: ## Regenerate Terraform documentation (requires terraform-docs)
 	terraform-docs markdown table --output-file README.md --output-mode inject .
 	terraform-docs markdown table --output-file modules/edge-functions/README.md --output-mode inject modules/edge-functions
 
+.PHONY: mirror-seed
+mirror-seed: build-lambda ## One-time: upload locally-built Lambda@Edge bundles to the artifacts bucket (EDGE_ARTIFACTS_BUCKET=... , SEED_VERSION=1.0.0)
+	@test -n "$(EDGE_ARTIFACTS_BUCKET)" || { echo "EDGE_ARTIFACTS_BUCKET is empty - apply the bucket first or pass it explicitly"; exit 1; }
+	@for fn in $(LAMBDA_FUNCTIONS); do \
+		tmp=$$(mktemp -d); \
+		cp $(LAMBDA_DIR)/packages/$$fn/build/index.js $$tmp/index.js; \
+		( cd $$tmp && zip -q fn.zip index.js ); \
+		echo "-> s3://$(EDGE_ARTIFACTS_BUCKET)/lambda-at-edge/$$fn/$(SEED_VERSION).zip"; \
+		aws s3 cp $$tmp/fn.zip s3://$(EDGE_ARTIFACTS_BUCKET)/lambda-at-edge/$$fn/$(SEED_VERSION).zip; \
+		rm -rf $$tmp; \
+	done
+	@echo "✓ seeded $(LAMBDA_FUNCTIONS) at $(SEED_VERSION)"
+
 ##@ Development
 
 .PHONY: dev
@@ -184,6 +210,8 @@ clean: ## Clean build artifacts
 	cd $(LAMBDA_DIR) && rm -rf packages/*/build function_archives .turbo packages/*/.turbo
 	@echo "Cleaning CloudFront Functions build artifacts..."
 	cd $(CF_DIR) && rm -rf packages/*/build .turbo packages/*/.turbo
+	@echo "Restoring the committed uri-rewrite bundle (consumed by Terraform)..."
+	cd $(CF_DIR) && yarn workspace @krishanthisera/uri-rewrite build
 	@echo "✓ Build artifacts cleaned"
 
 .PHONY: clean-all

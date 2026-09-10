@@ -7,7 +7,13 @@ version: 2
 updates:
 - package-ecosystem: "npm" # See documentation for possible values
   directories:
-  - "modules/lambda-at-edge/edge-functions"
-  - "modules/lambda-at-edge/edge-functions/packages/**" # Location of package manifests
+  - "lib/lambda-at-edge"
+  - "lib/lambda-at-edge/packages/**"
+  - "lib/cloudfront-functions"
+  - "lib/cloudfront-functions/packages/**" # Location of package manifests
+  schedule:
+    interval: "weekly"
+- package-ecosystem: "github-actions"
+  directory: "/"
   schedule:
     interval: "weekly"

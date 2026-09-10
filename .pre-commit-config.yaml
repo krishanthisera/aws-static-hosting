@@ -10,12 +10,12 @@ repos:
     - --hook-config=--add-to-existing-file=true
     - --hook-config=--create-file-if-not-exist=true
   - id: terraform_docs
-    name: terraform_docs (lambda-at-edge module)
+    name: terraform_docs (edge-functions module)
     args:
     - --hook-config=--path-to-file=README.md
     - --hook-config=--add-to-existing-file=true
     - --hook-config=--create-file-if-not-exist=true
-    files: ^modules/lambda-at-edge/
+    files: ^modules/edge-functions/
   - id: terraform_providers_lock
     args:
     - --args=-platform=linux_amd64
@@ -26,3 +26,16 @@ repos:
   rev: v6.0.0
   hooks:
   - id: check-merge-conflict
+
+- repo: local
+  hooks:
+  # The edge-functions Terraform module consumes the committed uri-rewrite
+  # CloudFront Function bundle directly. Rebuild it from source on any change so
+  # the committed artifact is never stale.
+  - id: build-uri-rewrite
+    name: build uri-rewrite CloudFront Function
+    language: system
+    entry: make build-uri-rewrite-committed
+    pass_filenames: false
+    require_serial: true
+    files: ^lib/cloudfront-functions/(packages/uri-rewrite/(src/|esbuild\.js|package\.json|tsconfig\.json)|yarn\.lock|package\.json)

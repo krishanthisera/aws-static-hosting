@@ -45,6 +45,12 @@ terraform.rc
 **/*.tgz
 **/.eslintcache
 
+# Exception: the built uri-rewrite CloudFront Function bundle is committed and
+# consumed directly by the edge-functions Terraform module (kept fresh by a
+# pre-commit hook).
+!lib/cloudfront-functions/packages/uri-rewrite/build/
+!lib/cloudfront-functions/packages/uri-rewrite/build/index.js
+
 # ---- OS / editor ----
 **/.DS_Store
 Thumbs.db

@@ -10,6 +10,12 @@ node_modules/
 **/build/
 dist/
 
+# Exception: the built uri-rewrite CloudFront Function bundle IS committed and
+# consumed directly by the edge-functions Terraform module (aws_cloudfront_function
+# has no S3/URL code source). A pre-commit hook rebuilds it from src/.
+!cloudfront-functions/packages/uri-rewrite/build/
+!cloudfront-functions/packages/uri-rewrite/build/index.js
+
 # TypeScript
 *.tsbuildinfo
 

@@ -32,13 +32,13 @@ jobs:
           - response-handler
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: lib/lambda-at-edge/.nvmrc
           registry-url: https://npm.pkg.github.com
@@ -51,6 +51,28 @@ jobs:
       - name: Build
         run: yarn build
         working-directory: lib/lambda-at-edge
+
+      # --- S3 mirror publish (DISABLED) -------------------------------------
+      # This repo does not deploy the Lambda@Edge functions, so a release only
+      # publishes the npm tarball to GitHub Packages + a GitHub Release. The
+      # optional S3 mirror step -- which copied build/index.js to
+      # s3://$EDGE_ARTIFACTS_BUCKET/lambda-at-edge/<fn>/<version>.zip for the
+      # Terraform edge-functions module to deploy from -- is turned off in two
+      # coupled places; re-enable BOTH together:
+      #   1. this "Configure AWS credentials" step, and
+      #   2. the "@semantic-release/exec" plugin block in every
+      #      lib/lambda-at-edge/packages/*/.releaserc.json (currently removed).
+      # Keeping the exec block without these credentials makes `aws s3 cp` fail,
+      # which fails the whole semantic-release run (no npm publish either).
+      # Also needs repo secrets EDGE_PUBLISHER_AWS_ACCESS_KEY_ID /
+      # EDGE_PUBLISHER_AWS_SECRET_ACCESS_KEY and repo var EDGE_ARTIFACTS_BUCKET.
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v6
+      #   with:
+      #     aws-access-key-id: ${{ secrets.EDGE_PUBLISHER_AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.EDGE_PUBLISHER_AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-1
+      # --------------------------------------------------------------------
 
       - name: Release
         run: npx --no-install semantic-release

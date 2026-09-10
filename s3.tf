@@ -11,19 +11,6 @@ resource "aws_s3_bucket_policy" "assets_bucket_cloudfront_policy_association" {
   policy = data.aws_iam_policy_document.s3_bucket_policy.json
 }
 
-# S3 bucket website configuration 
-resource "aws_s3_bucket_website_configuration" "assets_bucket_website" {
-  bucket = aws_s3_bucket.blog_assets.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "404.html"
-  }
-}
-
 # S3 bucket ACL
 resource "aws_s3_bucket_acl" "assets_bucket_acl" {
   bucket     = aws_s3_bucket.blog_assets.id

@@ -106,3 +106,21 @@ data "aws_route53_zone" "domain" {
   name         = var.domain_name
   private_zone = false
 }
+
+# IAM policy for the CI publisher user to upload built Lambda@Edge bundles
+data "aws_iam_policy_document" "allow_edge_artifacts_put" {
+  count = local.lambda_edge_enabled ? 1 : 0
+
+  statement {
+    sid    = "AllowEdgeArtifactsPut"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.edge_artifacts[0].arn}/lambda-at-edge/*"
+    ]
+  }
+}

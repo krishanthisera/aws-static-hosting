@@ -53,17 +53,53 @@ terraform init
 terraform apply
 ```
 
-## Lambda@Edge Functions
+## Edge Functions
 
-By default, three Lambda@Edge functions are associated with the CloudFront distribution:
+By default the CloudFront distribution runs one CloudFront Function and three
+Lambda@Edge functions:
 
-| Event Type | Function | Purpose |
-|---|---|---|
-| `viewer-request` | `filter-function` | Filters incoming viewer requests and determines if they should be prerendered |
-| `origin-request` | `prerender-proxy` | Proxies bot/crawler traffic to a prerender service for server-side rendering |
-| `origin-response` | `response-handler` | Applies cache-control headers to origin responses |
+| Event Type | Compute | Function | Purpose |
+|---|---|---|---|
+| `viewer-request` | CloudFront Function | `uri-rewrite` | Rewrites directory URIs to `index.html` |
+| `viewer-request` | Lambda@Edge | `filter-function` | Flags bot/crawler requests for prerendering |
+| `origin-request` | Lambda@Edge | `prerender-proxy` | Swaps the origin to a prerender service for flagged traffic |
+| `origin-response` | Lambda@Edge | `response-handler` | Applies cache-control headers to origin responses |
 
-These functions are managed by a local Terraform module located in `modules/edge-functions/`. The TypeScript source lives in `lib/lambda-at-edge/packages/` (Lambda@Edge) and `lib/cloudfront-functions/packages/` (CloudFront Functions); each package is built and published to the GitHub Packages npm registry as `@krishanthisera/<name>` by CI, and Terraform consumes a pinned version. Per-deployment config reaches the Lambda@Edge functions through CloudFront origin custom headers (`x-edge-cfg-*`) — see `lib/lambda-at-edge/README.md`.
+These are managed by the local module `modules/edge-functions/`. It **builds
+nothing**: TypeScript source lives in `lib/lambda-at-edge/` and
+`lib/cloudfront-functions/` and is published to GitHub Packages by CI. Terraform
+consumes a **pinned version** of each function, so `terraform plan` only shows a
+change when you bump a version — never a perpetual `source_code_hash` diff, and
+nothing is downloaded during `plan`/`apply`.
+
+- **Lambda@Edge**: `aws_lambda_function` deploys straight from
+  `s3://<edge_artifacts_bucket>/lambda-at-edge/<fn>/<version>.zip`. CI uploads the
+  zip on release; bump `function_versions["<fn>"]` to roll forward.
+- **CloudFront Functions**: `aws_cloudfront_function.code` must be inline, so the
+  built `uri-rewrite` bundle is committed at
+  `lib/cloudfront-functions/packages/uri-rewrite/build/index.js` and read with
+  `file()`. A pre-commit hook (`make build-uri-rewrite-committed`) keeps it
+  rebuilt from source.
+
+Per-deployment config reaches the Lambda@Edge functions through CloudFront origin
+custom headers (`x-edge-cfg-*`) — see `lib/lambda-at-edge/README.md`. Wiring those
+`custom_header` blocks is a separate follow-up and is not managed yet.
+
+### First-time setup
+
+The artifacts bucket must exist and hold the `1.0.0` bundles before the functions
+can deploy:
+
+```sh
+terraform apply -target=aws_s3_bucket.edge_artifacts -target=aws_iam_user.edge_publisher_user
+make mirror-seed EDGE_ARTIFACTS_BUCKET=$(terraform output -raw edge_artifacts_bucket)
+terraform apply
+```
+
+Then generate an access key for the `<domain>_edge_publisher` user and set the
+repo secrets `EDGE_PUBLISHER_AWS_ACCESS_KEY_ID` /
+`EDGE_PUBLISHER_AWS_SECRET_ACCESS_KEY` and the repo variable
+`EDGE_ARTIFACTS_BUCKET` so CI can upload future releases.
 
 ### Additional Functions
 
@@ -167,16 +203,21 @@ After `terraform apply`, generate an access key pair for this user and add the c
 | [aws_iam_group_policy_attachment.cloudfront_invalidation_group_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_group_policy_attachment) | resource |
 | [aws_iam_group_policy_attachment.s3_put_group_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_group_policy_attachment) | resource |
 | [aws_iam_policy.allow_cloudfront_invalidations_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.allow_edge_artifacts_put_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.allow_s3_put_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_user.edge_publisher_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user.pipeline_deployment_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
+| [aws_iam_user_policy_attachment.edge_publisher_put_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy_attachment) | resource |
 | [aws_route53_record.domain_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_s3_bucket.blog_assets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
+| [aws_s3_bucket.edge_artifacts](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_acl.assets_bucket_acl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
 | [aws_s3_bucket_cors_configuration.assets_bucket_cors](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_cors_configuration) | resource |
 | [aws_s3_bucket_ownership_controls.assets_bucket_acl_ownership](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
 | [aws_s3_bucket_policy.assets_bucket_cloudfront_policy_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
 | [aws_s3_bucket_public_access_block.assets_bucket_public_access](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
-| [aws_s3_bucket_website_configuration.assets_bucket_website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration) | resource |
+| [aws_s3_bucket_public_access_block.edge_artifacts](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
+| [aws_s3_bucket_versioning.edge_artifacts](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 
 ## Inputs
 
@@ -185,9 +226,13 @@ After `terraform apply`, generate an access key pair for this user and add the c
 | <a name="input_additional_domain_aliases"></a> [additional\_domain\_aliases](#input\_additional\_domain\_aliases) | Additional domain aliases for the website. | `list(string)` | `[]` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region to deploy to. This where the S3 bucket will be created. | `string` | `"ap-southeast-2"` | no |
 | <a name="input_bucket_name"></a> [bucket\_name](#input\_bucket\_name) | The name of the bucket without the www. prefix. Normally domain\_name. | `string` | n/a | yes |
+| <a name="input_cloudfront_function_associations"></a> [cloudfront\_function\_associations](#input\_cloudfront\_function\_associations) | CloudFront Function associations. CloudFront Functions only support viewer-request / viewer-response. | <pre>list(object({<br/>    event_type  = string<br/>    lambda_name = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "event_type": "viewer-request",<br/>    "lambda_name": "uri-rewrite"<br/>  }<br/>]</pre> | no |
 | <a name="input_common_tags"></a> [common\_tags](#input\_common\_tags) | Common tags you want applied to all components. | `any` | n/a | yes |
 | <a name="input_create_validation_records"></a> [create\_validation\_records](#input\_create\_validation\_records) | Whether to create Route 53 validation records for the SSL certificate. | `bool` | `false` | no |
+| <a name="input_custom_error_responses"></a> [custom\_error\_responses](#input\_custom\_error\_responses) | CloudFront custom error responses (e.g. map S3 403/404 to a static 404 page). | <pre>list(object({<br/>    error_code            = number<br/>    response_code         = optional(number)<br/>    response_page_path    = optional(string)<br/>    error_caching_min_ttl = optional(number)<br/>  }))</pre> | <pre>[<br/>  {<br/>    "error_caching_min_ttl": 10,<br/>    "error_code": 403,<br/>    "response_code": 404,<br/>    "response_page_path": "/404.html"<br/>  },<br/>  {<br/>    "error_caching_min_ttl": 10,<br/>    "error_code": 404,<br/>    "response_code": 404,<br/>    "response_page_path": "/404.html"<br/>  }<br/>]</pre> | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name for the website. | `string` | n/a | yes |
+| <a name="input_edge_artifacts_bucket_name"></a> [edge\_artifacts\_bucket\_name](#input\_edge\_artifacts\_bucket\_name) | Name of the S3 bucket (us-east-1) that mirrors the built Lambda@Edge function bundles published by CI. | `string` | `""` | no |
+| <a name="input_function_versions"></a> [function\_versions](#input\_function\_versions) | Pinned published version per edge function. Terraform only redeploys a function when its version here changes. | `map(string)` | <pre>{<br/>  "filter-function": "1.0.0",<br/>  "geo-redirect": "1.0.0",<br/>  "prerender-proxy": "1.0.0",<br/>  "response-handler": "1.0.0",<br/>  "uri-rewrite": "1.0.0"<br/>}</pre> | no |
 | <a name="input_lambda_associations"></a> [lambda\_associations](#input\_lambda\_associations) | Lambda function associations | <pre>list(object({<br/>    event_type  = string<br/>    lambda_name = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "event_type": "viewer-request",<br/>    "lambda_name": "filter-function"<br/>  },<br/>  {<br/>    "event_type": "origin-request",<br/>    "lambda_name": "prerender-proxy"<br/>  },<br/>  {<br/>    "event_type": "origin-response",<br/>    "lambda_name": "response-handler"<br/>  }<br/>]</pre> | no |
 | <a name="input_ssl_certificate_arn"></a> [ssl\_certificate\_arn](#input\_ssl\_certificate\_arn) | SSL certificate ARN for the CloudFront distribution. | `string` | `""` | no |
 
@@ -199,6 +244,8 @@ After `terraform apply`, generate an access key pair for this user and add the c
 | <a name="output_cloudfront_arn"></a> [cloudfront\_arn](#output\_cloudfront\_arn) | n/a |
 | <a name="output_cloudfront_distribution_id"></a> [cloudfront\_distribution\_id](#output\_cloudfront\_distribution\_id) | n/a |
 | <a name="output_cloudfront_domain_name"></a> [cloudfront\_domain\_name](#output\_cloudfront\_domain\_name) | n/a |
+| <a name="output_edge_artifacts_bucket"></a> [edge\_artifacts\_bucket](#output\_edge\_artifacts\_bucket) | n/a |
+| <a name="output_edge_publisher_user_name"></a> [edge\_publisher\_user\_name](#output\_edge\_publisher\_user\_name) | n/a |
 | <a name="output_iam_user_pipeline_deployment_user_arn"></a> [iam\_user\_pipeline\_deployment\_user\_arn](#output\_iam\_user\_pipeline\_deployment\_user\_arn) | n/a |
 | <a name="output_iam_user_pipeline_deployment_user_name"></a> [iam\_user\_pipeline\_deployment\_user\_name](#output\_iam\_user\_pipeline\_deployment\_user\_name) | n/a |
 <!-- END_TF_DOCS -->
