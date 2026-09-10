@@ -30,6 +30,8 @@ jobs:
           - prerender-proxy
           - geo-redirect
           - response-handler
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
